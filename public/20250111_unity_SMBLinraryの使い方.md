@@ -1,5 +1,5 @@
 ---
-title: unity_sbmlibrary
+title: 【Unity】 SMB Libraryでファイル共有
 tags:
   - Unity
   - SMB
@@ -8,7 +8,7 @@ updated_at: ""
 id: null
 organization_url_name: null
 slide: false
-ignorePublish: false
+ignorePublish: true
 ---
 
 ## 概要
