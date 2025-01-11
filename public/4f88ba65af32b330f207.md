@@ -1,11 +1,11 @@
 ---
 title: 【Unity】ProjectSettingsの iOS (Player設定) に関するメモ
 tags:
-  - Unity
   - iOS
+  - Unity
   - ProjectSettings
 private: false
-updated_at: "2025-01-10T11:13:15+09:00"
+updated_at: '2025-01-11T13:18:50+09:00'
 id: 4f88ba65af32b330f207
 organization_url_name: null
 slide: false
