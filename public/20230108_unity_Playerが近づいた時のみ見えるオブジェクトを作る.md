@@ -1,5 +1,5 @@
 ---
-title: 【Unity】 Playerが近づいた時のみ見える( 透明→不透明)オブジェクトを作る
+title: 【Unity】 Playerが近づいた時のみ見えるオブジェクトを作る
 tags:
   - C#
   - Unity
