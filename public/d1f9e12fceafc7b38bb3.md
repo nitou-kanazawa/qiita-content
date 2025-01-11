@@ -4,21 +4,23 @@ tags:
   - Unity
   - uGUI
 private: false
-updated_at: '2024-11-14T09:10:47+09:00'
+updated_at: "2024-11-14T09:10:47+09:00"
 id: d1f9e12fceafc7b38bb3
 organization_url_name: null
 slide: false
 ignorePublish: false
 ---
+
 ## 概要
-Vector3や配列等の複数の要素を持つ型に使用できるInputFieldが必要だったため、汎用的に使用できそうなものを作成した．カスタムInputFieldは、入力値を内部でReactiveProperty<T>に変換して管理し、外部へはその変換後の値を通知する．また、Modelとの連携を容易にするためのインタフェースを実装しておく．
+
+Vector3 や配列等の複数の要素を持つ型に使用できる InputField が必要だったため、汎用的に使用できそうなものを作成した．カスタム InputField は、入力値を内部で ReactiveProperty<T>に変換して管理し、外部へはその変換後の値を通知する．また、Model との連携を容易にするためのインタフェースを実装しておく．
 
 ## 実装の詳細
 
 **インタフェース定義**
-ゲッタ/セッタと通知用Observableを持つインタフェース．
+ゲッタ/セッタと通知用 Observable を持つインタフェース．
 
-``` IDataHolder.cs
+```IDataHolder.cs
 namespace nitou {
 
     /// <summary>
@@ -46,11 +48,9 @@ namespace nitou {
 
 ```
 
+**基本の InputField ビュークラス**
 
-**基本のInputFieldビュークラス**
-
-
-``` InputFieldView.cs
+```InputFieldView.cs
 using System;
 using UniRx;
 using UnityEngine;
@@ -75,11 +75,11 @@ namespace nitou.UI{
 
 ```
 
-**Vector3用のカスタムInputField**
+**Vector3 用のカスタム InputField**
 
-※入力文字列のバリデーションは別途InputFieldインスペクタで設定する想定．
+※入力文字列のバリデーションは別途 InputField インスペクタで設定する想定．
 
-``` Vector3InputFieldView.cs
+```Vector3InputFieldView.cs
 using System;
 using System.Globalization;
 using UniRx;

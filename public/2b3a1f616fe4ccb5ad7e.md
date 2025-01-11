@@ -4,72 +4,74 @@ tags:
   - C#
   - Unity
 private: false
-updated_at: '2024-06-29T19:54:16+09:00'
+updated_at: "2024-06-29T19:54:16+09:00"
 id: 2b3a1f616fe4ccb5ad7e
 organization_url_name: null
 slide: false
 ignorePublish: false
 ---
-## 初めに
-この記事はUnity初学者が学習の備忘録として書いたものです．誤っている点もあるかと思いますので，その際はご指摘いただけると幸いです．
 
+## 初めに
+
+この記事は Unity 初学者が学習の備忘録として書いたものです．誤っている点もあるかと思いますので，その際はご指摘いただけると幸いです．
 
 ## 完成イメージ
-下図のように2Dゲームの背景をそれっぽく動かすことを目指しました．
+
+下図のように 2D ゲームの背景をそれっぽく動かすことを目指しました．
 
 環境：Unity6 Preview (6000.0.4f1)
 
 ![メディア1.gif](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/1596227/24e0cfbd-07f7-7b54-1578-17c01e6e0cd4.gif)
 
 #### 概要
+
 全体の流れとしては以下の通りです．
-1. ShaderGraphサンプルを利用してシェーダー作成
-2. マテリアルをSpriteRenderに適用
+
+1. ShaderGraph サンプルを利用してシェーダー作成
+2. マテリアルを SpriteRender に適用
 3. プロパティ操作用コンポーネントを作成
 4. アセット"DOTween"でアニメーションさせる
 
+## Shader Graph の公式サンプル
 
-## Shader Graphの公式サンプル
-ShaderGraphには、 Procedural Patternsというサンプルデータが提供されています．
+ShaderGraph には、 Procedural Patterns というサンプルデータが提供されています．
 詳しくは以下の記事を参照してください．
 
 https://zenn.dev/r_ngtm/books/shadergraph-cookbook/viewer/tips-samples
 
-今回はサンプルの"Stripes"ノードを使用して，各種パラメータを設定できるUnlitシェーダーを作成しました．"Stripes"ノードは入力として "Offset" を受け付けているため，ここに "Time"ノードの出力を入れることで時間経過によるスクロールが可能です．
+今回はサンプルの"Stripes"ノードを使用して，各種パラメータを設定できる Unlit シェーダーを作成しました．"Stripes"ノードは入力として "Offset" を受け付けているため，ここに "Time"ノードの出力を入れることで時間経過によるスクロールが可能です．
 
-※"Time"ノードとUVオフセットを使用すれば容易に動きのあるシェーダーを作成できます．
-
+※"Time"ノードと UV オフセットを使用すれば容易に動きのあるシェーダーを作成できます．
 
 ![画像1.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/1596227/6ddf44ba-9dbb-a86a-dc77-a11d9af7408c.png)
 
-下表のプロパティを作成しました．プロパティはGraph Editorのブラックボードで作成できます．
-※このあとC#スクリプトからアクセスする際には，下表の [Reference名] でプロパティにアクセスします．
+下表のプロパティを作成しました．プロパティは Graph Editor のブラックボードで作成できます．
+※このあと C#スクリプトからアクセスする際には，下表の [Reference 名] でプロパティにアクセスします．
 
-|Name|Reference|型|役割|
-|:---:|:---:|:--:|:--:|
-|Frequency|_Frequency|Float|周期(線の本数)|
-|Thickness|_Thickness|Float|線の間隔|
-|ScrollX|_ScrollX|Float|X方向のオフセット速度|
-|ScrollY|_ScrollY|Float|Y方向のオフセット速度|
-|Rotation|_Rotation|Float|線の傾き|
-|Color1|_Color1|Color|色|
-|Color2|_Color2|Color|色|
-
+|   Name    |  Reference  |  型   |          役割          |
+| :-------: | :---------: | :---: | :--------------------: |
+| Frequency | \_Frequency | Float |     周期(線の本数)     |
+| Thickness | \_Thickness | Float |        線の間隔        |
+|  ScrollX  |  \_ScrollX  | Float | X 方向のオフセット速度 |
+|  ScrollY  |  \_ScrollY  | Float | Y 方向のオフセット速度 |
+| Rotation  | \_Rotation  | Float |        線の傾き        |
+|  Color1   |  \_Color1   | Color |           色           |
+|  Color2   |  \_Color2   | Color |           色           |
 
 ## 背景オブジェクトの準備
-背景はSprite Rendererで作成することにします．
-Create GameObject Menuの "2D Object > Sprites > Square" でオブジェクトを作成して，Material項目に作成したマテリアルを適用します．
+
+背景は Sprite Renderer で作成することにします．
+Create GameObject Menu の "2D Object > Sprites > Square" でオブジェクトを作成して，Material 項目に作成したマテリアルを適用します．
 
 ![タイトルなし.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/1596227/75f698ed-c542-292a-5e06-1320ff73df1f.png)
-
 
 ## マテリアルの操作に関して
 
 ##### プロパティの設定
 
-マテリアルのプロパティは "SetFloat", "SetVector" 等のセッターで設定できます．引数に [プロパティ名]，もしくは[プロパティID] を渡すことで，任意のプロパティを指定できます．
+マテリアルのプロパティは "SetFloat", "SetVector" 等のセッターで設定できます．引数に [プロパティ名]，もしくは[プロパティ ID] を渡すことで，任意のプロパティを指定できます．
 
-``` Test.cs
+```Test.cs
 Material _material = GetComponent<Renderer>().material;
 
 // 名前指定で_Colorプロパティを設定
@@ -84,7 +86,7 @@ https://kan-kikuchi.hatenablog.com/entry/Material
 
 <br>
 
-↓ Shaderがどのようなプロパティを持っているかはインスペクタの"Properities"項目で確認することができます．
+↓ Shader がどのようなプロパティを持っているかはインスペクタの"Properities"項目で確認することができます．
 
 ![qiita_fig01.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/1596227/879d9c88-9fba-e81e-7626-2b2ac43dea74.png)
 
@@ -92,10 +94,10 @@ https://kan-kikuchi.hatenablog.com/entry/Material
 
 またマテリアルのプロパティにアクセスすると，自動でコピーが生成されます（プロパティの変更はコピーに対して行われる）．そのためコピーされたオブジェクトは自分で破棄しないとメモリリークを引き起こすようです．
 
-``` TestMonoBehaviour.cs
+```TestMonoBehaviour.cs
 Material _material;
 
-private void Awake() {   
+private void Awake() {
     _material = GetComponent<Renderer>().material;
     _material.color = Color;
 }
@@ -107,17 +109,18 @@ private void OnDestroy() {
     }
 }
 ```
+
 Resources.UnloadUnusedAssets() でも使われてないマテリアルを削除することができます．
 
 https://www.create-forever.games/unity-material-memory-leak/
 
 https://light11.hatenadiary.com/entry/2019/11/03/223241
 
-
 ## 適当な操作コンポーネントを作成
+
 必須ではありませんが，materal.GetVelue() / materal.SetVelue()の操作を簡略化するため下コードのようにアクセス用のプロパティを用意しておきます．
 
-``` test.cs
+```test.cs
     [RequireComponent(typeof(SpriteRenderer))]
     public class Test : MonoBehaviour {
 
@@ -137,10 +140,11 @@ https://light11.hatenadiary.com/entry/2019/11/03/223241
             Destroy(_material);
         }
     }
-``` 
+```
 
 さほどメリットを感じませんが一応マテリアルを意識せずにパラメータ設定が行えます．
-``` test.cs
+
+```test.cs
     [RequireComponent(typeof(SpriteRenderer))]
     public class Test : MonoBehaviour {
 
@@ -151,12 +155,12 @@ https://light11.hatenadiary.com/entry/2019/11/03/223241
             Frequency = frequency;
         }
     }
-``` 
+```
 
 <br>
 またアセット"DOTween"には任意のプロパティをアニメーションさせる DOTween.To() というメソッドがあります．こちらを用いると簡単にアニメーション処理を実装できます．
 
-``` test.cs
+```test.cs
 [RequireComponent(typeof(SpriteRenderer))]
     public class Test : MonoBehaviour {
 
@@ -181,19 +185,18 @@ https://light11.hatenadiary.com/entry/2019/11/03/223241
             }
         }
     }
-``` 
-DOTweenの文法については以下の記事を参照ください．
+```
+
+DOTween の文法については以下の記事を参照ください．
 
 https://zenn.dev/ohbashunsuke/books/20200924-dotween-complete/viewer/dotween-05
 
-
 ## 最終的なコード
-
 
 <details><summary> Material Handler 　(マテリアル操作を簡略化するためのラッパー)</summary>
 ※マテリアルは動的に生成する形に変更しています．
 
-``` MaterialHandler.cs
+```MaterialHandler.cs
 using System;
 using UnityEngine;
 
@@ -208,7 +211,7 @@ namespace nitou {
         protected Material _material = null;
 
         /// ----------------------------------------------------------------------------
-        // Public Method 
+        // Public Method
 
         public MaterialHandler(Shader shader) {
             if (shader == null) throw new ArgumentNullException(nameof(shader));
@@ -235,7 +238,7 @@ namespace nitou {
 
 
         /// ----------------------------------------------------------------------------
-        // Protected Method 
+        // Protected Method
 
         /// <summary>
         /// マテリアルのプロパティID定義
@@ -256,8 +259,9 @@ namespace nitou {
 }
 ```
 
-↓今回作ったシェーダー用のクラス．
-``` StripeMaterial.cs
+↓ 今回作ったシェーダー用のクラス．
+
+```StripeMaterial.cs
 using UnityEngine;
 
 namespace nitou {
@@ -313,13 +317,13 @@ namespace nitou {
 
 
         /// ----------------------------------------------------------------------------
-        // Public Method 
+        // Public Method
 
         public StripeMaterial(Shader shader) : base(shader) {}
 
 
         /// ----------------------------------------------------------------------------
-        // Protected Method 
+        // Protected Method
 
         /// <summary>
         /// マテリアルのプロパティID定義
@@ -337,13 +341,14 @@ namespace nitou {
 }
 
 ```
+
 </details>
 
-*** 
+---
 
 <details><summary>Material Controller 　(Rendererを持つGameObjectにアタッチするコンポーネント)</summary>
 
-``` MaterialController.cs
+```MaterialController.cs
 using UnityEngine;
 
 namespace nitou {
@@ -360,7 +365,7 @@ namespace nitou {
         protected T _handler = null;
 
         /// ----------------------------------------------------------------------------
-        // MonoBehaviour Method 
+        // MonoBehaviour Method
 
         private void Awake() {
             _handler = CreateHandler(_shader);
@@ -372,7 +377,7 @@ namespace nitou {
         }
 
         /// ----------------------------------------------------------------------------
-        // Protected Method 
+        // Protected Method
 
         /// <summary>
         /// シェーダーからマテリアルとハンドラを生成する
@@ -390,8 +395,10 @@ namespace nitou {
 
 }
 ```
+
 今回作ったシェーダーのマテリアルを操作するコンポーネント
-``` StripeMaterialController.cs
+
+```StripeMaterialController.cs
 using UnityEngine;
 using DG.Tweening;
 
@@ -400,14 +407,14 @@ namespace nitou {
     public class StripeMaterialController : MaterialController<StripeMaterial> {
 
         /// ----------------------------------------------------------------------------
-        // Protected Method 
+        // Protected Method
 
         protected override StripeMaterial CreateHandler(Shader shader) {
             return new StripeMaterial(shader);
         }
 
         /// ----------------------------------------------------------------------------
-        // Public Method 
+        // Public Method
 
         public Tweener Tween_Frequency(float endValue, float duration) {
             return DOTween.To(
@@ -457,16 +464,17 @@ namespace nitou {
 
 }
 ```
+
 </details>
 
+---
 
-***
 以下のクラスで簡単な動作確認をした結果です．（今回作ったシェーダーではアスペクト比の変更に対応していないので，変形させると斜線が崩れます．）
 
 ↓ 実行結果
 ![メディア2.gif](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/1596227/b588c3c0-ba18-687f-84f4-132e0a3f1e24.gif)
 
-``` testMain.cs
+```testMain.cs
     // 動作確認用
     public class testMain : MonoBehaviour {
         [SerializeField] StripeMaterialController _controller;
@@ -505,10 +513,10 @@ namespace nitou {
                 .Join(_controller.Tween_ScrollX(0.5f, 0.2f))
                 .Join(_controller.Tween_ScrollY(0.5f, 0.2f));
         }
-``` 
+```
 
 ## 終わりに
- Procedural Patternsには様々なサンプルデータが含まれるため，色々なパターンを試せそうです．
- 
-![d2j4qpvlmkwelo7n50j8xmn4wobg.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/1596227/e3efad62-4c65-3cb9-d564-2405fda8268c.png)
 
+Procedural Patterns には様々なサンプルデータが含まれるため，色々なパターンを試せそうです．
+
+![d2j4qpvlmkwelo7n50j8xmn4wobg.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/1596227/e3efad62-4c65-3cb9-d564-2405fda8268c.png)
