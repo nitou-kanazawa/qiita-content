@@ -2,11 +2,11 @@
 title: 【Swift】SwiftUIに関するメモ
 tags:
   - Swift
-  - SwiftUI
   - 初学者
+  - SwiftUI
 private: true
-updated_at: ""
-id: null
+updated_at: '2025-01-13T14:18:53+09:00'
+id: 5da6af1e7e25e8629d62
 organization_url_name: null
 slide: false
 ignorePublish: false
